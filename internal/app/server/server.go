@@ -44,7 +44,8 @@ func (s *httpServer) Run() {
 	// app init
 	s.fiberApp = fiber.New(fiber.Config{
 		AppName:       "Werminal",
-		ServerHeader:  "Werminal",
+		ServerHeader:  "Werminal Server",
+		ErrorHandler:  customErrorHandler,
 		StrictRouting: false,
 	})
 
