@@ -1,0 +1,13 @@
+### Golang .gitignore template
+
+# Logs
+*.log
+
+# Environments
+.env
+env/
+ENV/
+*.env
+
+# local notes
+notes.txt
