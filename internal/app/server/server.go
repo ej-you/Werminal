@@ -68,7 +68,9 @@ func (s *httpServer) Run() {
 
 	// register endpoints
 	apiV1 := s.fiberApp.Group("/api/v1")
-	http.RegisterEndpoints(apiV1.Group("/"), terminalController)
+	apiV1WS := apiV1.Group("/ws", middleware.WebSocket())
+
+	http.RegisterEndpoints(apiV1WS.Group("/"), terminalController)
 
 	// start app
 	go func() {

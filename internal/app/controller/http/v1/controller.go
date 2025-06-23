@@ -3,16 +3,15 @@
 package v1
 
 import (
-	"net/http"
 	"time"
 
-	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
+	"github.com/gofiber/fiber/v2"
+	websocket "github.com/gofiber/websocket/v2"
 )
 
 // TerminalController is a HTTP-controller for task usecase.
 type TerminalController struct {
-	upgrader   *websocket.Upgrader
+	wsConfig   websocket.Config
 	pongWait   time.Duration
 	pingPeriod time.Duration
 	// taskUC task.Usecase
@@ -23,13 +22,9 @@ func NewTerminalController(readBufferSize, writeBufferSize int,
 	pongWait, pingPeriod time.Duration) *TerminalController {
 
 	return &TerminalController{
-		upgrader: &websocket.Upgrader{
+		wsConfig: websocket.Config{
 			ReadBufferSize:  readBufferSize,
 			WriteBufferSize: writeBufferSize,
-			// allow all origins to upgrade protocol
-			CheckOrigin: func(_ *http.Request) bool {
-				return true
-			},
 		},
 		pongWait:   pongWait,
 		pingPeriod: pingPeriod,
@@ -38,17 +33,13 @@ func NewTerminalController(readBufferSize, writeBufferSize int,
 }
 
 // UpgradeWebSocket upgrades HTTP-connection to WebSocket and register client handlers.
-func (c *TerminalController) UpgradeWebSocket(w http.ResponseWriter, r *http.Request) {
-	// upgrade connection to WebSocket
-	conn, err := c.upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		logrus.Errorf("upgrade conn to ws: %v", err)
-		return
-	}
-	logrus.Info("open new ws conn")
-
-	// create new WebSocket client and start client handlers
-	client := newClientWS(conn, c.pongWait, c.pingPeriod)
-	go client.HandleRead()
-	go client.HandleWrite()
+func (c *TerminalController) Terminal() fiber.Handler {
+	return websocket.New(func(conn *websocket.Conn) {
+		// create new WebSocket client and start client handlers
+		client := newClientWS(conn, c.pongWait, c.pingPeriod)
+		go client.HandleRead()
+		go client.HandleWrite()
+		// wait for client disconnection
+		client.Wait()
+	}, c.wsConfig)
 }

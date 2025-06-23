@@ -10,7 +10,7 @@ import (
 )
 
 // JSON-format for logs
-const _logFormat = `INFO[${time}] ${status} | ${method} | ${path} | ${latency} | (err) ${error}"`
+const _logFormat = `INFO[${time}] ${status} | ${method} | ${path} | ${latency} | (err) ${error}`
 
 // Logger is a middleware for logging all request-response chains.
 func Logger() fiber.Handler {
