@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"Werminal/config"
+	http "Werminal/internal/app/controller/http/v1"
 	"Werminal/internal/app/middleware"
 )
 
@@ -42,9 +43,8 @@ func New(cfg *config.Config) Server {
 func (s *httpServer) Run() {
 	// app init
 	s.fiberApp = fiber.New(fiber.Config{
-		AppName:       "Task Manager",
-		ErrorHandler:  customErrorHandler,
-		ServerHeader:  "Task Manager HTTP API",
+		AppName:       "Werminal",
+		ServerHeader:  "Werminal",
 		StrictRouting: false,
 	})
 
@@ -56,11 +56,18 @@ func (s *httpServer) Run() {
 	// taskRepoStorage := taskrepo.NewRepoStorage(s.store)
 	// // create usecases
 	// taskUsecase := taskusecase.NewUsecase(taskRepoStorage)
-	// // create controllers
-	// taskController := taskhttp.NewController(taskUsecase, s.valid)
-	// // register endpoints
-	// apiV1 := s.fiberApp.Group("/api/v1")
-	// taskhttp.RegisterEndpoints(apiV1.Group("/task"), taskController)
+
+	// create controllers
+	terminalController := http.NewTerminalController(
+		s.cfg.Server.WS.ReadBufferSize,
+		s.cfg.Server.WS.WriteBufferSize,
+		s.cfg.Server.WS.PongWait,
+		s.cfg.Server.WS.PingPeriod,
+	)
+
+	// register endpoints
+	apiV1 := s.fiberApp.Group("/api/v1")
+	http.RegisterEndpoints(apiV1.Group("/"), terminalController)
 
 	// start app
 	go func() {

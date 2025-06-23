@@ -7,19 +7,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// JSONFormatterUTC is the logrus.JSONFormatter wrapper with time in UTC.
-type JSONFormatterUTC struct {
-	logrus.JSONFormatter
+// textFormatterUTC is the logrus.JSONFormatter wrapper with time in UTC.
+type textFormatterUTC struct {
+	logrus.TextFormatter
+}
+
+// newTextFormatterUTC returns new textFormatterUTC instance.
+func newTextFormatterUTC() *textFormatterUTC {
+	return &textFormatterUTC{
+		TextFormatter: logrus.TextFormatter{
+			FullTimestamp: true,
+		},
+	}
 }
 
 // Format implements logrus.Formatter and sets time to UTC.
-func (f JSONFormatterUTC) Format(e *logrus.Entry) ([]byte, error) {
+func (f *textFormatterUTC) Format(e *logrus.Entry) ([]byte, error) {
 	e.Time = e.Time.UTC()
-	return f.JSONFormatter.Format(e)
+	return f.TextFormatter.Format(e)
 }
 
 // Init sets up main logger for application.
 func Init() {
 	logrus.SetOutput(os.Stderr)
-	logrus.SetFormatter(JSONFormatterUTC{})
+	logrus.SetFormatter(newTextFormatterUTC())
 }

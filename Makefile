@@ -1,7 +1,7 @@
 source = ./cmd/app/main.go
 
 
-dev: swagger
+dev:
 	go run $(source)
 
 lint:

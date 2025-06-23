@@ -5,7 +5,7 @@ Terminal in web-interface.
 ## Needed `env` variables
 
 ```dotenv
-APP_PORT=8080
+SERVER_PORT=8080
 SERVER_SHUTDOWN_TIMEOUT=5s
 ```
 
