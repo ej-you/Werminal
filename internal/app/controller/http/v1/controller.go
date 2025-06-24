@@ -11,9 +11,7 @@ import (
 
 // TerminalController is a HTTP-controller for task usecase.
 type TerminalController struct {
-	wsConfig   websocket.Config
-	pongWait   time.Duration
-	pingPeriod time.Duration
+	wsConfig websocket.Config
 	// taskUC task.Usecase
 }
 
@@ -26,8 +24,6 @@ func NewTerminalController(readBufferSize, writeBufferSize int,
 			ReadBufferSize:  readBufferSize,
 			WriteBufferSize: writeBufferSize,
 		},
-		pongWait:   pongWait,
-		pingPeriod: pingPeriod,
 		// taskUC: taskUC,
 	}
 }
@@ -36,7 +32,7 @@ func NewTerminalController(readBufferSize, writeBufferSize int,
 func (c *TerminalController) Terminal() fiber.Handler {
 	return websocket.New(func(conn *websocket.Conn) {
 		// create new WebSocket client and start client handlers
-		client := newClientWS(conn, c.pongWait, c.pingPeriod)
+		client := newClientWS(conn)
 		go client.HandleRead()
 		go client.HandleWrite()
 		// wait for client disconnection

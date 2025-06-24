@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"time"
-
 	websocket "github.com/gofiber/websocket/v2"
 	"github.com/sirupsen/logrus"
 )
@@ -14,10 +12,6 @@ type incomingMessage []byte
 type clientWS struct {
 	// conn with client
 	conn *websocket.Conn
-	// duration for wait client message
-	pongWait time.Duration
-	// send one ping message per this period
-	pingPeriod time.Duration
 
 	// chan for incoming messages
 	message chan incomingMessage
@@ -26,13 +20,11 @@ type clientWS struct {
 }
 
 // newClientWS returns new clientWS instance.
-func newClientWS(conn *websocket.Conn, pongWait, pingPeriod time.Duration) *clientWS {
+func newClientWS(conn *websocket.Conn) *clientWS {
 	return &clientWS{
-		conn:       conn,
-		pongWait:   pongWait,
-		pingPeriod: pingPeriod,
-		message:    make(chan incomingMessage),
-		done:       make(chan struct{}),
+		conn:    conn,
+		message: make(chan incomingMessage),
+		done:    make(chan struct{}),
 	}
 }
 
