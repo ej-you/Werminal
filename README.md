@@ -1,6 +1,6 @@
 # Werminal
 
-Terminal in web-interface.
+Terminal in web-interface (for linux).
 
 ## Needed `env` variables
 
