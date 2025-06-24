@@ -2,46 +2,39 @@ package command
 
 import (
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestPing(t *testing.T) {
-	t.Log("Run ping command and read its output")
+	t.Log("Run ping command and read its output (it works)")
 
 	t.Log("Init command")
 	cmd, err := New("ping", "ya.ru")
 	require.NoError(t, err)
 	defer cmd.clear()
 
-	reader := strings.NewReader("")
-
-	t.Log("Run command")
-	err = cmd.Run(os.Stdout, reader)
+	t.Log("Start command")
+	err = cmd.Start(os.Stdout, os.Stdin)
 	require.NoError(t, err)
 
-	// out := make(chan []byte)
-	// defer close(out)
-	// t.Log("Read command output")
-
-	// go cmd.Output(out)
-	// for line := range out {
-	// 	t.Log("output:", string(line))
-	// }
+	err = cmd.Wait()
+	require.NoError(t, err)
 }
 
-func TestTelnet(t *testing.T) {
-	t.Log("Run telnet command, read its output and open writer to stdin")
+func TestBash(t *testing.T) {
+	t.Log("Open new bash shell (it does NOT work)")
 
 	t.Log("Init command")
 	cmd, err := New("bash")
 	require.NoError(t, err)
 	defer cmd.clear()
 
-	t.Log("Run command")
-	err = cmd.Run(os.Stdout, os.Stdin)
+	t.Log("Start command")
+	err = cmd.Start(os.Stdout, os.Stdin)
 	require.NoError(t, err)
 
+	err = cmd.Wait()
+	require.NoError(t, err)
 }
