@@ -55,38 +55,18 @@ func New(name string, arg ...string) (*Cmd, error) {
 	}, nil
 }
 
-// Run runs command and wait for it to finish. This method is blocking.
-// It uses given writer for command output and reader for command input.
+// Start starts command. It uses given writer for
+// command output and reader for command input.
 func (c *Cmd) Start(w io.Writer, r io.Reader) error {
 	if err := c.command.Start(); err != nil {
 		return fmt.Errorf("start command: %w", err)
 	}
-
-	// chan for reader/writer exit signal
-	// done := make(chan error, 2)
-	// defer close(done)
 
 	// read output from command and write to writer
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
 		io.Copy(w, io.MultiReader(c.stdoutPipe, c.stderrPipe))
-		// fmt.Println("BBBBBBB")
-		// var err error
-		// scanner := bufio.NewScanner(io.MultiReader(c.stdoutPipe, c.stderrPipe))
-		// for scanner.Scan() {
-		// 	fmt.Println("EEEEEE")
-		// 	_, err = w.Write(scanner.Bytes())
-		// 	fmt.Println("FFFFFF")
-		// 	if err != nil {
-		// 		fmt.Println("HHHHHH")
-		// 		fmt.Println("err:", err)
-		// 		done <- fmt.Errorf("write to writer: %w", err)
-		// 		return
-		// 	}
-		// 	fmt.Println("GGGGGG")
-		// }
-		// done <- fmt.Errorf("scan stdout and stderr: %w", scanner.Err())
 	}()
 
 	// read input from reader and write to command stdin
@@ -94,35 +74,15 @@ func (c *Cmd) Start(w io.Writer, r io.Reader) error {
 	go func() {
 		defer c.wg.Done()
 		io.Copy(c.stdinPipe, r)
-		// fmt.Println("CCCCCCC")
-		// var err error
-		// scanner := bufio.NewScanner(r)
-		// for scanner.Scan() {
-		// 	fmt.Println("DDDD")
-		// 	_, err = c.stdinPipe.Write(append(scanner.Bytes(), '\n'))
-		// 	if err != nil {
-		// 		done <- fmt.Errorf("write to stdin: %w", err)
-		// 		return
-		// 	}
-		// }
-		// done <- fmt.Errorf("scan reader: %w", scanner.Err())
 	}()
 
-	// fmt.Println("AAAAAAAA")
-
-	// // err := <-done
-	// c.clear()
-	// fmt.Println("done err:", err)
-	// // wait for the command to finish
-	// if err := c.command.Wait(); err != nil {
-	// 	return fmt.Errorf("wait for cmd to finish: %w", err)
-	// }
-	// fmt.Println("IIIIIII")
 	return nil
 }
 
+// Wait waits for started command to finish.
+// This method is blocking.
 func (c *Cmd) Wait() error {
-	defer c.clear()
+	defer c.cleanup()
 
 	err := c.command.Wait()
 	c.wg.Wait()
@@ -133,8 +93,8 @@ func (c *Cmd) Wait() error {
 	return nil
 }
 
-// clear cleans up resources for command execution.
-func (c *Cmd) clear() {
+// cleanup cleans up resources used for command execution.
+func (c *Cmd) cleanup() {
 	if c.stdinPipe != nil {
 		c.stdinPipe.Close()
 	}

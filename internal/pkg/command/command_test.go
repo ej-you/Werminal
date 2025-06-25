@@ -13,7 +13,7 @@ func TestPing(t *testing.T) {
 	t.Log("Init command")
 	cmd, err := New("ping", "ya.ru")
 	require.NoError(t, err)
-	defer cmd.clear()
+	defer cmd.cleanup()
 
 	t.Log("Start command")
 	err = cmd.Start(os.Stdout, os.Stdin)
@@ -29,7 +29,7 @@ func TestBash(t *testing.T) {
 	t.Log("Init command")
 	cmd, err := New("bash")
 	require.NoError(t, err)
-	defer cmd.clear()
+	defer cmd.cleanup()
 
 	t.Log("Start command")
 	err = cmd.Start(os.Stdout, os.Stdin)
