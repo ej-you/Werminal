@@ -10,6 +10,7 @@ import (
 
 	"github.com/creack/pty"
 	"github.com/pkg/errors"
+	"golang.org/x/sys/unix"
 )
 
 // Terminal is a pseudo-terminal.
@@ -56,6 +57,10 @@ func (t *pterm) Run(output io.Writer, input io.Reader) error {
 	if err != nil {
 		return fmt.Errorf("start pty: %w", err)
 	}
+	// disable terminal echo
+	if err := t.disableEcho(); err != nil {
+		return fmt.Errorf("disable echo: %w", err)
+	}
 
 	// read output from pty and write to output writer
 	t.wg.Add(1)
@@ -85,4 +90,23 @@ func (t *pterm) Wait() error {
 	t.wg.Wait()
 
 	return errors.Wrap(err, "wait for pty to finish") // err OR nil
+}
+
+// disableEcho disables echo for input commands.
+func (t *pterm) disableEcho() error {
+	fd := int(t.ptyFile.Fd())
+
+	// get current terminal settings
+	termios, err := unix.IoctlGetTermios(fd, unix.TCGETS)
+	if err != nil {
+		return fmt.Errorf("get current term settings: %w", err)
+	}
+	// unset ECHO flag (put away unix.ECHO bit from termios.Lflag)
+	termios.Lflag &^= unix.ECHO
+
+	// apply changes
+	if err := unix.IoctlSetTermios(fd, unix.TCSETS, termios); err != nil {
+		return fmt.Errorf("change term settings: %w", err)
+	}
+	return nil
 }
