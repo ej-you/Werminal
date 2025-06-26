@@ -73,6 +73,12 @@ linters:
       - build
       - deployment
       - docs
+      - website
+    rules:
+      - linters:
+          - varnamelen
+        path: internal/pkg/
+        text: "(parameter|variable) name '(w|p|r|fd)' is too short for the scope of its usage"
 
 issues:
   fix: false

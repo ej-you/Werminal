@@ -11,6 +11,8 @@ import (
 	"io"
 	"os/exec"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Cmd is an external command.
@@ -66,14 +68,19 @@ func (c *Cmd) Start(w io.Writer, r io.Reader) error {
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
-		io.Copy(w, io.MultiReader(c.stdoutPipe, c.stderrPipe))
+		_, err := io.Copy(w, io.MultiReader(c.stdoutPipe, c.stderrPipe))
+		if err != nil {
+			logrus.Errorf("copy to writer: %v", err)
+		}
 	}()
 
 	// read input from reader and write to command stdin
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
-		io.Copy(c.stdinPipe, r)
+		if _, err := io.Copy(c.stdinPipe, r); err != nil {
+			logrus.Errorf("copy from reader: %v", err)
+		}
 	}()
 
 	return nil

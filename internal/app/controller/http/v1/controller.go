@@ -25,7 +25,6 @@ type TerminalController struct {
 
 // NewTerminalController returns new TerminalController.
 func NewTerminalController(readBufferSize, writeBufferSize int) *TerminalController {
-
 	return &TerminalController{
 		wsConfig: gowebsocket.Config{
 			ReadBufferSize:  readBufferSize,

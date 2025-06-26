@@ -12,10 +12,9 @@ import (
 
 	"github.com/creack/pty"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 )
-
-const _killError = "signal: killed" // error string for kill signal
 
 // Terminal is a pseudo-terminal.
 type Terminal interface {
@@ -39,7 +38,7 @@ func New(rows, columns uint16) (Terminal, error) {
 	if !ok {
 		return nil, errors.New("terminal shell not specified")
 	}
-	if len(shell) == 0 {
+	if shell == "" {
 		return nil, errors.New("invalid terminal shell value")
 	}
 
@@ -70,14 +69,18 @@ func (t *pterm) Run(output io.Writer, input io.Reader) error {
 	t.wg.Add(1)
 	go func() {
 		defer t.wg.Done()
-		io.Copy(output, t.ptyFile)
+		if _, err := io.Copy(output, t.ptyFile); err != nil {
+			logrus.Errorf("copy to output: %v", err)
+		}
 	}()
 
 	// read input from input reader and write to pty
 	t.wg.Add(1)
 	go func() {
 		defer t.wg.Done()
-		io.Copy(t.ptyFile, input)
+		if _, err := io.Copy(t.ptyFile, input); err != nil {
+			logrus.Errorf("copy from input: %v", err)
+		}
 	}()
 
 	return nil
