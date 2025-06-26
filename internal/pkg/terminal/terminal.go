@@ -1,7 +1,9 @@
-// Package terminal provides interface to create and run pseudo-terminal.
+// Package terminal provides interface of pseudo-terminal
+// that has run and wait for shutdown methods.
 package terminal
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -13,10 +15,12 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+const _killError = "signal: killed" // error string for kill signal
+
 // Terminal is a pseudo-terminal.
 type Terminal interface {
 	Run(output io.Writer, input io.Reader) error
-	Wait() error
+	Wait(ctx context.Context) error
 }
 
 // pterm is the Terminal implementation.
@@ -55,7 +59,7 @@ func (t *pterm) Run(output io.Writer, input io.Reader) error {
 	// start pseudo-terminal with init size
 	t.ptyFile, err = pty.StartWithSize(t.cmd, t.size)
 	if err != nil {
-		return fmt.Errorf("start pty: %w", err)
+		return fmt.Errorf("start pterm: %w", err)
 	}
 	// disable terminal echo
 	if err := t.disableEcho(); err != nil {
@@ -80,16 +84,42 @@ func (t *pterm) Run(output io.Writer, input io.Reader) error {
 }
 
 // Wait waits for started pterm to finish.
-// This method is blocking.
-func (t *pterm) Wait() error {
-	defer t.ptyFile.Close()
+// It immediately kills terminal if given context is done.
+func (t *pterm) Wait(ctx context.Context) error {
+	if t.ptyFile == nil {
+		return nil
+	}
 
+	doneErr := make(chan error)
+	defer close(doneErr)
+	// task with waiting for pty to finish
+	go func() {
+		defer t.ptyFile.Close()
+		doneErr <- t.cmd.Wait()
+	}()
+
+	var err error
+	select {
 	// wait for pty to finish
-	err := t.cmd.Wait()
-	// wait for streams
-	t.wg.Wait()
+	case err = <-doneErr:
+	// wait for context
+	case <-ctx.Done():
+		// kill terminal immediately
+		if killErr := t.cmd.Process.Kill(); killErr != nil {
+			err = fmt.Errorf("kill pterm: %w", killErr)
+		}
+		// still waiting for pty to finish
+		finishErr := <-doneErr
+		if finishErr != nil && err != nil {
+			err = errors.Wrap(finishErr, err.Error())
+		} else if finishErr != nil {
+			err = finishErr
+		}
+	}
 
-	return errors.Wrap(err, "wait for pty to finish") // err OR nil
+	// wait for input/output streams
+	t.wg.Wait()
+	return errors.Wrap(err, "stop pterm") // err OR nil
 }
 
 // disableEcho disables echo for input commands.
@@ -99,14 +129,14 @@ func (t *pterm) disableEcho() error {
 	// get current terminal settings
 	termios, err := unix.IoctlGetTermios(fd, unix.TCGETS)
 	if err != nil {
-		return fmt.Errorf("get current term settings: %w", err)
+		return fmt.Errorf("get current pterm settings: %w", err)
 	}
 	// unset ECHO flag (put away unix.ECHO bit from termios.Lflag)
 	termios.Lflag &^= unix.ECHO
 
 	// apply changes
 	if err := unix.IoctlSetTermios(fd, unix.TCSETS, termios); err != nil {
-		return fmt.Errorf("change term settings: %w", err)
+		return fmt.Errorf("change pterm settings: %w", err)
 	}
 	return nil
 }

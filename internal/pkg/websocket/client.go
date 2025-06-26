@@ -1,35 +1,37 @@
-package v1
+// Package websocket provides client and stream to
+// handle WebSocket messages.
+package websocket
 
 import (
 	websocket "github.com/gofiber/websocket/v2"
 	"github.com/sirupsen/logrus"
 )
 
-// incomingMessage is an incoming message from client.
-type incomingMessage []byte
+// IncomingMessage is an incoming message from client.
+type IncomingMessage []byte
 
-// clientWS is a client for WebSocket connection.
-type clientWS struct {
+// Client is a client for WebSocket connection.
+type Client struct {
 	// conn with client
 	conn *websocket.Conn
 
 	// chan for incoming messages
-	message chan incomingMessage
+	message chan IncomingMessage
 	// for graceful shutdown
 	done chan struct{}
 }
 
-// newClientWS returns new clientWS instance.
-func newClientWS(conn *websocket.Conn) *clientWS {
-	return &clientWS{
+// NewClient returns new Client instance.
+func NewClient(conn *websocket.Conn) *Client {
+	return &Client{
 		conn:    conn,
-		message: make(chan incomingMessage),
+		message: make(chan IncomingMessage),
 		done:    make(chan struct{}),
 	}
 }
 
 // HandleRead handles new incoming message.
-func (c *clientWS) HandleRead() {
+func (c *Client) HandleRead() {
 	defer func() {
 		c.conn.Close()
 		close(c.message)
@@ -50,7 +52,7 @@ func (c *clientWS) HandleRead() {
 }
 
 // HandleWrite waits for new incoming message in client's chan and processes it.
-func (c *clientWS) HandleWrite() {
+func (c *Client) HandleWrite() {
 	defer func() {
 		c.conn.Close()
 		close(c.done)
@@ -73,12 +75,12 @@ func (c *clientWS) HandleWrite() {
 
 // Wait waits for client is done.
 // This method is blocking.
-func (c *clientWS) Wait() {
+func (c *Client) Wait() {
 	<-c.done
 }
 
 // processMessage processes incoming message and send answer to client.
-func (c *clientWS) processMessage(msg incomingMessage) {
+func (c *Client) processMessage(msg IncomingMessage) {
 	err := c.conn.WriteMessage(websocket.TextMessage, msg)
 	if err != nil {
 		logrus.Errorf("send message: %v", err)

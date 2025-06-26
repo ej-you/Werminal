@@ -53,17 +53,10 @@ func (s *httpServer) Run() {
 	s.fiberApp.Use(middleware.Logger())
 	s.fiberApp.Use(middleware.Recover())
 
-	// // create repos
-	// taskRepoStorage := taskrepo.NewRepoStorage(s.store)
-	// // create usecases
-	// taskUsecase := taskusecase.NewUsecase(taskRepoStorage)
-
 	// create controllers
 	terminalController := http.NewTerminalController(
 		s.cfg.Server.WS.ReadBufferSize,
 		s.cfg.Server.WS.WriteBufferSize,
-		s.cfg.Server.WS.PongWait,
-		s.cfg.Server.WS.PingPeriod,
 	)
 
 	// register endpoints
