@@ -32,7 +32,7 @@ type pterm struct {
 
 // New returns new Terminal instance.
 // Rows and columns parameters set the terminal size.
-func New(rows, columns uint16) (Terminal, error) {
+func New(rows, cols uint16) (Terminal, error) {
 	// parse terminal shell value
 	shell, ok := os.LookupEnv("SHELL")
 	if !ok {
@@ -46,7 +46,7 @@ func New(rows, columns uint16) (Terminal, error) {
 		cmd: exec.Command(shell),
 		size: &pty.Winsize{
 			Rows: rows,
-			Cols: columns,
+			Cols: cols,
 		},
 	}, nil
 }

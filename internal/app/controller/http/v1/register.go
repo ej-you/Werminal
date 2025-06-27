@@ -6,5 +6,5 @@ import (
 
 // RegisterEndpoints registers all endpoints.
 func RegisterEndpoints(router fiber.Router, controller *TerminalController) {
-	router.Get("/", controller.Terminal())
+	router.Get("/terminal", controller.Terminal())
 }

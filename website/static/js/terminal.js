@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
     fitAddon.fit(); // Автоподгонка под размер окна
 
     // WebSocket соединение
-    const socket = new WebSocket('ws://127.0.0.1:8080/api/v1/ws');
+    const addr = `ws://127.0.0.1:8080/api/v1/ws/terminal/?rows=${term.rows}&cols=${term.cols}`
+    const socket = new WebSocket(addr);
 
     // Очистка текущей строки ввода
     function clearCurrentLine() {
