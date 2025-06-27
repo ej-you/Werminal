@@ -9,5 +9,8 @@ env/
 ENV/
 *.env
 
-# local notes
+# Local notes
 notes.txt
+
+# Client
+website/node_modules/
