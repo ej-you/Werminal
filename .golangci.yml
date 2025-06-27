@@ -75,10 +75,14 @@ linters:
       - docs
       - website
     rules:
-      - linters:
+      - linters: # this names is standart
           - varnamelen
         path: internal/pkg/
         text: "(parameter|variable) name '(w|p|r|fd)' is too short for the scope of its usage"
+      - linters: # before parsed from string with 16 bit size
+          - gosec
+        path: internal/app/controller/http/v1/data_in\.go
+        text: "G115: integer overflow conversion uint64 -> uint16"
 
 issues:
   fix: false

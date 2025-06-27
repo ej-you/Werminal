@@ -41,7 +41,7 @@ func NewTerminalController(readBufferSize, writeBufferSize int) *TerminalControl
 // }
 
 // Terminal handles WebSocket connection with terminal input/output.
-// TODO: add query params for terminal rows and columns
+// It can parse rows and cols query params to setup custom terminal size.
 func (c *TerminalController) Terminal() fiber.Handler {
 	return gowebsocket.New(func(conn *gowebsocket.Conn) {
 		dataIn, err := parseTerminalIn(conn)
