@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	_termRows = 180 // pseudo-terminal rows
-	_termCols = 35  // pseudo-terminal columns
+	_termRows = 35  // pseudo-terminal rows
+	_termCols = 180 // pseudo-terminal columns
 )
 
 // TerminalController is a HTTP-controller for task usecase.
@@ -49,6 +49,7 @@ func NewTerminalController(readBufferSize, writeBufferSize int) *TerminalControl
 // TODO: add query params for terminal rows and columns
 func (c *TerminalController) Terminal() fiber.Handler {
 	return gowebsocket.New(func(conn *gowebsocket.Conn) {
+		logrus.Info("New connection to terminal")
 		// context for stream and terminal
 		ctx, cancel := context.WithCancel(context.Background())
 
@@ -60,7 +61,7 @@ func (c *TerminalController) Terminal() fiber.Handler {
 			defer close(done)
 			defer cancel()
 			if err := wsStream.Wait(ctx); err != nil {
-				logrus.Errorf("close ws conn: %v", err)
+				logrus.Warnf("close ws conn: %v", err)
 			}
 		}()
 
@@ -78,10 +79,11 @@ func (c *TerminalController) Terminal() fiber.Handler {
 
 		// wait for terminal to finish
 		if err := term.Wait(ctx); err != nil {
-			logrus.Error(err)
+			logrus.Warn(err)
 		}
 		// cancel ctx to close ws conn (if it not closed)
 		cancel()
 		<-done
+		logrus.Info("Disconnect from terminal")
 	}, c.wsConfig)
 }

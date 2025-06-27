@@ -70,7 +70,7 @@ func (t *pterm) Run(output io.Writer, input io.Reader) error {
 	go func() {
 		defer t.wg.Done()
 		if _, err := io.Copy(output, t.ptyFile); err != nil {
-			logrus.Errorf("copy to output: %v", err)
+			logrus.Warnf("copy to output: %v", err)
 		}
 	}()
 
@@ -79,7 +79,7 @@ func (t *pterm) Run(output io.Writer, input io.Reader) error {
 	go func() {
 		defer t.wg.Done()
 		if _, err := io.Copy(t.ptyFile, input); err != nil {
-			logrus.Errorf("copy from input: %v", err)
+			logrus.Warnf("copy from input: %v", err)
 		}
 	}()
 
