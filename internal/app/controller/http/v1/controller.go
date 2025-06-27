@@ -28,18 +28,6 @@ func NewTerminalController(readBufferSize, writeBufferSize int) *TerminalControl
 	}
 }
 
-// // UpgradeWebSocket upgrades HTTP-connection to WebSocket and register client handlers.
-// func (c *TerminalController) Terminal() fiber.Handler {
-// 	return websocket.New(func(conn *websocket.Conn) {
-// 		// create new WebSocket client and start client handlers
-// 		client := newClientWS(conn)
-// 		go client.HandleRead()
-// 		go client.HandleWrite()
-// 		// wait for client disconnection
-// 		client.Wait()
-// 	}, c.wsConfig)
-// }
-
 // Terminal handles WebSocket connection with terminal input/output.
 // It can parse rows and cols query params to setup custom terminal size.
 func (c *TerminalController) Terminal() fiber.Handler {
