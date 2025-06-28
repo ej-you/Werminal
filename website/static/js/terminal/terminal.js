@@ -7,10 +7,12 @@ function NewTerminal(elem /* HTMLElement */) /* Terminal */ {
     // инициализация терминала
     const term = new Terminal({
         cursorBlink: true,
-        fontSize: 14,
+        fontSize: 16,
         theme: {
-            background: '#222222',
-            foreground: '#FFFFFF'
+            background: "#222222",
+            foreground: "#FFFFFF",
+            cursor: "#FFFFFF",
+            cursorAccent: "#222222",
         }
     });
     // почему-то класс FitAddon загружается в window.FitAddon
@@ -22,7 +24,7 @@ function NewTerminal(elem /* HTMLElement */) /* Terminal */ {
     fitAddon.fit();
 
     // автоматическое изменение размера терминала
-    window.addEventListener('resize', () => fitAddon.fit());
+    window.addEventListener("resize", () => fitAddon.fit());
 
     return term
 }
@@ -32,7 +34,7 @@ function NewTerminal(elem /* HTMLElement */) /* Terminal */ {
 // @param: term - Terminal
 function SetupTerminalFocus(elem /* HTMLElement */, term /* Terminal */) {
     // фокус на терминал при клике
-    elem.addEventListener('click', () => {
+    elem.addEventListener("click", () => {
         term.focus();
     });
     // фокус при загрузке страницы
