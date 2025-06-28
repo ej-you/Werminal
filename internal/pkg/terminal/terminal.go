@@ -16,6 +16,8 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+const _disableEcho = false // disable terminal echo flag
+
 // Terminal is a pseudo-terminal.
 type Terminal interface {
 	Run(output io.Writer, input io.Reader) error
@@ -60,9 +62,11 @@ func (t *pterm) Run(output io.Writer, input io.Reader) error {
 	if err != nil {
 		return fmt.Errorf("start pterm: %w", err)
 	}
-	// disable terminal echo
-	if err := t.disableEcho(); err != nil {
-		return fmt.Errorf("disable echo: %w", err)
+	// disable terminal echo if needed
+	if _disableEcho {
+		if err := t.disableEcho(); err != nil {
+			return fmt.Errorf("disable echo: %w", err)
+		}
 	}
 
 	// read output from pty and write to output writer
