@@ -9,13 +9,3 @@ dev:
 
 lint:
 	golangci-lint run -c ./.golangci.yml ./...
-
-# + ------ +
-# + client +
-# + ------ +
-
-client:
-	cd ./website && npx http-server -p 3000
-
-ts:
-	cd ./website && tsc

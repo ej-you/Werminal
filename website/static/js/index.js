@@ -1,9 +1,10 @@
-import { NewWebSocket } from './ws/ws.js';
-import { NewTerminal, SetupTerminalFocus, TermState } from './terminal/terminal.js';
-import { SetupOnMessage } from './terminal/ws/get/message.js';
-import { SetupOnError } from './terminal/ws/get/error.js';
-import { SetupOnClose } from './terminal/ws/get/close.js';
-import { SetupOnKey } from './terminal/ws/send/key.js';
+// import { NewWebSocket } from './ws/ws.js';
+// import { NewTerminal, SetupTerminalFocus, TermState } from './terminal/terminal.js';
+// import { TermState } from './terminal/state.js';
+// import { SetupOnMessage } from './terminal/ws/get/message.js';
+// import { SetupOnError } from './terminal/ws/get/error.js';
+// import { SetupOnClose } from './terminal/ws/get/close.js';
+// import { SetupOnKey } from './terminal/ws/send/key.js';
 
 // получение HTML элемента для терминала
 const terminalElement = function () {

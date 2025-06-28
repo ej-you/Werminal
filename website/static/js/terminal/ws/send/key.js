@@ -1,12 +1,118 @@
-import { Terminal } from "@xterm/xterm";
-import { TermState } from "../../terminal";
+// import { Terminal } from "@xterm/xterm";
+// import { TermState } from "../../state.js";
 
-// Обработка ввода с клавиатуры
-export function SetupOnKey(ws: WebSocket, term: Terminal, termState: TermState) {
+// возвращает true если введён число-буквенно-символьный (печатаемый) символ
+// @return: boolean
+function isPrintable(keyEvent /* KeyboardEvent */) /* boolean */ {
+    if (keyEvent.ctrlKey || keyEvent.altKey || keyEvent.metaKey) {
+        return false
+    }
+    const key = keyEvent.key;
+    if (["Backspace", "Tab", "Insert", "Delete"].includes(key)) {
+        return false
+    }
+    if (["PageUp", "PageDown", "Home", "End"].includes(key)) {
+        return false
+    }
+    if (["Enter", "Escape"].includes(key)) {
+        return false
+    }
+    if (["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"].includes(key)) {
+        return false
+    }
+    const fRegex = /^F[123456789][012]?$/; // Fn keys check
+    if (key.match(fRegex) != null) {
+        return false
+    }
+    return true
+}
+
+function printable(ws /* WebSocket */, term /* Terminal */, termState /* TermState */, key /* string */) {
+    console.log("print:", key)
+    ws.send(key);
+
+    console.log("termState 1:", termState)
+
+    // высчитываем позицию курсора и вставляем элемент в нужное место буфера
+    const cursor = termState.cursorPos;
+    termState.inputBuffer = termState.inputBuffer.slice(0, cursor) + key + termState.inputBuffer.slice(cursor);
+    termState.moveCursorRight()
+
+    console.log("termState 2:", termState)
+
+    // вставка символа
+    term.write(key);
+    const newCursor = termState.cursorPos;
+    // переписываем остаток строки если вставка в середину
+    if (newCursor < termState.inputBuffer.length - 1) {
+        term.write(termState.inputBuffer.slice(newCursor));
+    }
+}
+
+function arrowLeft(ws /* WebSocket */, term /* Terminal */, termState /* TermState */) {
+    term.write("\x1b[2K");
+    return
+
+    const cursorBefore = termState.cursorPos
+    termState.moveCursorLeft()
+
+    // если курсор сдвинулся
+    if (cursorBefore != termState.cursorPos) {
+        term.write("\x1b[D");
+        ws.send("\x1b[D");
+    }
+}
+
+function arrowRight(ws /* WebSocket */, term /* Terminal */, termState /* TermState */) {
+    const cursorBefore = termState.cursorPos
+    termState.moveCursorRight()
+
+    // если курсор сдвинулся
+    if (cursorBefore != termState.cursorPos) {
+        term.write("\x1b[C");
+        ws.send("\x1b[C");
+    }
+}
+
+// обработка ввода с клавиатуры
+function SetupOnKey(ws /* WebSocket */, term /* Terminal */, termState /* TermState */) {
     term.onKey(e => {
-        console.log("key:", e.key)
-        console.log("domEvent:", e.domEvent)
+        // if (keyEvent.ctrlKey || keyEvent.altKey || keyEvent.metaKey) {
+        //     return
+        // }
+        // console.log("keyEvent: ", keyEvent)
+
+        const keyEvent = e.domEvent;
+        const keyName = keyEvent.key;
+
+        // const termOutput = keyEvent.key; // строка для записи в элемент терминала
+        // const wsOutput = keyEvent.key; // строка для отправки на сервер
+
+        switch (true) {
+            // любая печатаемая цифра/буква/символ
+            case isPrintable(keyEvent):
+                printable(ws, term, termState, keyName)
+                break;
+            // case keyName == "ArrowLeft":
+            //     arrowLeft(ws, term, termState)
+            //     break;
+            // case keyName == "ArrowRight":
+            //     arrowRight(ws, term, termState)
+            //     break;
+            default:
+                console.log("NOT PRINTABLE:", e.domEvent)
+        }
     });
+    // term.onData(raw => {
+    //     let data = raw;
+    //     if (data == "\r") {
+    //         data = "\r\n"
+    //     }
+
+    //     console.log(`"${data}" | lenght: `, data.length)
+    //     term.write(data);
+    //     ws.send(data);
+    // });
 }
 
 // term.onKey(e => {
