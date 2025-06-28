@@ -1,0 +1,6 @@
+.golangci.yml
+Makefile
+README.md
+
+deployment/
+build/
