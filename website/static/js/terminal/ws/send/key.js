@@ -27,6 +27,13 @@ function isPrintable(keyEvent /* KeyboardEvent */) /* boolean */ {
     return true
 }
 
+function isControl(keyEvent /* KeyboardEvent */) /* boolean */ {
+    if (keyEvent.ctrlKey || keyEvent.altKey || keyEvent.metaKey) {
+        return true
+    }
+    return false
+}
+
 function printable(ws /* WebSocket */, term /* Terminal */, termState /* TermState */, key /* string */) {
     console.log("print:", key)
     ws.send(key);
@@ -74,45 +81,89 @@ function arrowRight(ws /* WebSocket */, term /* Terminal */, termState /* TermSt
     }
 }
 
+// возвращает true, если нажатая клавиша F1-F12
+function isFn(data /* string */) /* boolean */ {
+    const fnList = [
+        "\x1bOP", "\x1bOQ", "\x1bOR", "\x1bOS",
+        "\x1b[15~", "\x1b[17~", "\x1b[18~", "\x1b[19~",
+        "\x1b[20~", "\x1b[21~", "\x1b[23~", "\x1b[24~",
+    ]
+
+    if (fnList.includes(data)) {
+        return true
+    }
+    return false
+}
+
 // обработка ввода с клавиатуры
 function SetupOnKey(ws /* WebSocket */, term /* Terminal */, termState /* TermState */) {
-    term.onKey(e => {
-        // if (keyEvent.ctrlKey || keyEvent.altKey || keyEvent.metaKey) {
-        //     return
-        // }
-        // console.log("keyEvent: ", keyEvent)
+    // term.onKey(e => {
+    //     // if (keyEvent.ctrlKey || keyEvent.altKey || keyEvent.metaKey) {
+    //     //     return
+    //     // }
+    //     // console.log("keyEvent: ", keyEvent)
 
-        const keyEvent = e.domEvent;
-        const keyName = keyEvent.key;
+    //     const keyEvent = e.domEvent;
+    //     const keyName = keyEvent.key;
 
-        // const termOutput = keyEvent.key; // строка для записи в элемент терминала
-        // const wsOutput = keyEvent.key; // строка для отправки на сервер
+    //     // const termOutput = keyEvent.key; // строка для записи в элемент терминала
+    //     // const wsOutput = keyEvent.key; // строка для отправки на сервер
+
+    //     switch (true) {
+    //         // любая печатаемая цифра/буква/символ
+    //         case isPrintable(keyEvent):
+    //             printable(ws, term, termState, keyName)
+    //             break;
+    //         case isControl(keyEvent):
+    //             console.log(String.fromCharCode(keyEvent.keyCode))
+    //         // case keyName == "ArrowLeft":
+    //         //     arrowLeft(ws, term, termState)
+    //         //     break;
+    //         // case keyName == "ArrowRight":
+    //         //     arrowRight(ws, term, termState)
+    //         //     break;
+    //         default:
+    //             console.log("NOT PRINTABLE:", e.domEvent)
+    //     }
+    // });
+    term.onData(raw => {
+        let printOut = false;
+
+        let data = raw;
 
         switch (true) {
-            // любая печатаемая цифра/буква/символ
-            case isPrintable(keyEvent):
-                printable(ws, term, termState, keyName)
+            case data == "\r": // Enter
+                // data = "\r\n"
                 break;
-            // case keyName == "ArrowLeft":
-            //     arrowLeft(ws, term, termState)
+            case data === "\u007f": // Backspase
+                console.log("BACKSPASE")
+                printOut = false
+                break;
+            // case data === "\x1b[D": // ArrowLeft
+            //     console.log("LEFT")
+            //     return
+            // case data === "\x1b[C": // ArrowRight
+            //     console.log("RIGHT")
+            //     return
+            // case data === "\x1b[A": // ArrowUp
+            //     console.log("UP")
+            //     return
+            // case data === "\x1b[B": // ArrowDown
+            //     console.log("DOWN")
+            //     return
+            // case isFn(data): // F1-F12
+            //     // Fn печатаются, поэтому пропускаем это для них
+            //     console.log("FN")
+            //     printOut = false
             //     break;
-            // case keyName == "ArrowRight":
-            //     arrowRight(ws, term, termState)
-            //     break;
-            default:
-                console.log("NOT PRINTABLE:", e.domEvent)
         }
-    });
-    // term.onData(raw => {
-    //     let data = raw;
-    //     if (data == "\r") {
-    //         data = "\r\n"
-    //     }
 
-    //     console.log(`"${data}" | lenght: `, data.length)
-    //     term.write(data);
-    //     ws.send(data);
-    // });
+        console.log(`"${data}" raw: ${JSON.stringify(data)} | lenght: `, data.length)
+        if (printOut) {
+            term.write(data);
+        }
+        ws.send(data);
+    });
 }
 
 // term.onKey(e => {
