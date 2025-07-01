@@ -71,6 +71,7 @@ function clearNginx() {
 }
 
 function finish() {
+    rm -rf /var/www/werminal
     echo -e "${gc}Werminal successfully uninstalled!${dc}"
 }
 
