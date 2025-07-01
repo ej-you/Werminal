@@ -76,13 +76,7 @@ function setupNginx() {
     cp ./werminal.conf /etc/nginx/sites-available/werminal.conf
     ln -s /etc/nginx/sites-available/werminal.conf /etc/nginx/sites-enabled/werminal.conf
 
-    if [ ! "$(nginx -t)" ]; then
-        echo "Invalid Nginx config syntax"
-        echo "Check your nginx config files and run this script again"
-        echo "Aborted"
-        exit 1
-    fi
-
+    nginx -t
     nginx -s reload
 }
 
