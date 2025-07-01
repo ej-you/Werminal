@@ -1,0 +1,7 @@
+FROM node:alpine3.22
+
+WORKDIR /client
+
+COPY ./website/package.json .
+
+CMD ["npm", "i"]

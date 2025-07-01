@@ -1,0 +1,14 @@
+[Unit]
+Description=Werminal server part
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+User=root
+EnvironmentFile=/var/www/werminal/server/env
+WorkingDirectory=/var/www/werminal/server/bin
+ExecStart=/var/www/werminal/server/bin/app
+
+[Install]
+WantedBy=multi-user.target
