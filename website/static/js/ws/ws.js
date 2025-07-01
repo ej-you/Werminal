@@ -1,4 +1,4 @@
-const host = "wss://domain.com:8092";
+const host = "wss://fredcv.ru:8092";
 
 // открытие WebSocket соединения
 function NewWebSocket(rows /* number */, cols /* number */) /* WebSocket */ {

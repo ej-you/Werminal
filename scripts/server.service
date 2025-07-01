@@ -5,10 +5,10 @@ After=network.target
 [Service]
 Type=simple
 Restart=always
-User=root
+User=danil
 EnvironmentFile=/var/www/werminal/server/env
 WorkingDirectory=/var/www/werminal/server/bin
-ExecStart=/var/www/werminal/server/bin/app
+ExecStart=/home/danil
 
 [Install]
 WantedBy=multi-user.target
