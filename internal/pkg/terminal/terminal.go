@@ -35,13 +35,15 @@ type pterm struct {
 // New returns new Terminal instance.
 // Rows and columns parameters set the terminal size.
 func New(rows, cols uint16) (Terminal, error) {
-	// parse terminal shell value
-	shell, ok := os.LookupEnv("SHELL")
-	if !ok {
-		return nil, errors.New("terminal shell not specified")
-	}
-	if shell == "" {
-		return nil, errors.New("invalid terminal shell value")
+	shell := "bash"
+
+	err := exec.Command("command", "-v", "bash").Run()
+	if err != nil {
+		logrus.Warning("bash shell not found; use SHELL value as shell")
+		shell, err = parseShell()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &pterm{
@@ -146,4 +148,17 @@ func (t *pterm) disableEcho() error {
 		return fmt.Errorf("change pterm settings: %w", err)
 	}
 	return nil
+}
+
+// parseShell parses value of SHELL env-variable.
+func parseShell() (string, error) {
+	// parse terminal shell value
+	shell, ok := os.LookupEnv("SHELL")
+	if !ok {
+		return "", errors.New("terminal shell not specified")
+	}
+	if shell == "" {
+		return "", errors.New("invalid terminal shell value")
+	}
+	return shell, nil
 }

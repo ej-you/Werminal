@@ -82,7 +82,7 @@ function setupNginx() {
 
 function finish() {
     echo "Installation is finished!"
-    echo "Your app run at http://localhost:8803"
+    echo "Your app run at http://domain.com:8092"
 
     echo "Pay attention, please!"
     echo "If app is not run, check line \"include /etc/nginx/sites-enabled/*;\" in http directive in main nginx config (/etc/nginx/nginx.conf)"

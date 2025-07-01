@@ -1,7 +1,7 @@
-const hostAddr = "127.0.0.1:8803";
+const host = "wss://domain.com:8092";
 
 // открытие WebSocket соединения
 function NewWebSocket(rows /* number */, cols /* number */) /* WebSocket */ {
-    const addr = `ws://${hostAddr}/api/v1/ws/terminal/?rows=${rows}&cols=${cols}`
+    const addr = `${host}/api/v1/ws/terminal/?rows=${rows}&cols=${cols}`
     return new WebSocket(addr);
 }
