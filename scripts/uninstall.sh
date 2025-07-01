@@ -13,7 +13,7 @@ function checkRoot() {
 
     if [ "$user" != "root" ]; then
         echo "Please, run this script with root privileges"
-        echo "${rc}Aborted${dc}"
+        echo -e "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -23,9 +23,9 @@ function checkDocker() {
     echo "Check docker..."
 
     if [ ! "$(command -v docker)" ]; then
-        echo "${rc}ERROR: Docker is not installed${dc}"
+        echo -e "${rc}ERROR: Docker is not installed${dc}"
         echo "Install docker manually and run this script again"
-        echo "${rc}Aborted${dc}"
+        echo -e "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -35,9 +35,9 @@ function checkNginx() {
     echo "Check nginx..."
 
     if [ ! "$(command -v nginx)" ]; then
-        echo "${rc}ERROR: Nginx is not installed${dc}"
+        echo -e "${rc}ERROR: Nginx is not installed${dc}"
         echo "Install nginx manually and run this script again"
-        echo "${rc}Aborted${dc}"
+        echo -e "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -55,11 +55,11 @@ function removeServer() {
     echo "Remove server files..."
     rm -rf /var/www/werminal/server
 
-    echo "${yc}Stop server..."
-    echo "To stop server process you should find it and kill."
-    echo "To find server process use \"pgrep -af /var/www/werminal/server/bin/app\""
-    echo "This command will print out the proccess PID and run binary"
-    echo "Use \"sudo kill -9 {PID}\" to kill server process${dc}"
+    echo -e "${yc}Stop server..."
+    echo -e "To stop server process you should find it and kill."
+    echo -e "To find server process use \"pgrep -af /var/www/werminal/server/bin/app\""
+    echo -e "This command will print out the proccess PID and run binary"
+    echo -e "Use \"sudo kill -9 {PID}\" to kill server process${dc}"
 }
 
 # remove nginx config for this app
@@ -71,7 +71,7 @@ function clearNginx() {
 }
 
 function finish() {
-    echo "${gc}Werminal successfully uninstalled!${dc}"
+    echo -e "${gc}Werminal successfully uninstalled!${dc}"
 }
 
 checkRoot

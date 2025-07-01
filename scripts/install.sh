@@ -20,7 +20,7 @@ function checkRoot() {
 
     if [ "$user" != "root" ]; then
         echo "Please, run this script with root privileges"
-        echo "${rc}Aborted${dc}"
+        echo -e "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -30,9 +30,9 @@ function checkDocker() {
     echo "Check docker..."
 
     if [ ! "$(command -v docker)" ]; then
-        echo "${rc}ERROR: Docker is not installed${dc}"
+        echo -e "${rc}ERROR: Docker is not installed${dc}"
         echo "Install docker manually and run this script again"
-        echo "${rc}Aborted${dc}"
+        echo -e "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -42,9 +42,9 @@ function checkNginx() {
     echo "Check nginx..."
 
     if [ ! "$(command -v nginx)" ]; then
-        echo "${rc}ERROR: Nginx is not installed${dc}"
+        echo -e "${rc}ERROR: Nginx is not installed${dc}"
         echo "Install nginx manually and run this script again"
-        echo "${rc}Aborted${dc}"
+        echo -e "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -87,12 +87,12 @@ function setupNginx() {
 }
 
 function finish() {
-    echo "${gc}Installation is finished!${dc}"
+    echo -e "${gc}Installation is finished!${dc}"
     echo "Your app run at http://$domain:$nginxPort"
 
-    echo "${yc}Pay attention, please!"
-    echo "If app is not run, check line \"include /etc/nginx/sites-enabled/*;\" in http directive in main nginx config (/etc/nginx/nginx.conf)"
-    echo "If this line missing then insert it and restart nginx with \"nginx -s reload\"${dc}"
+    echo -e "${yc}Pay attention, please!"
+    echo -e "If app is not run, check line \"include /etc/nginx/sites-enabled/*;\" in http directive in main nginx config (/etc/nginx/nginx.conf)"
+    echo -e "If this line missing then insert it and restart nginx with \"nginx -s reload\"${dc}"
 }
 
 checkRoot
