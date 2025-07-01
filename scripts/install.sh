@@ -79,6 +79,8 @@ function setupServer() {
 
 # setup nginx
 function setupNginx() {
+    cd "$scriptPath" || exit 1
+
     cp ./werminal.conf /etc/nginx/sites-available/werminal.conf
     ln -s /etc/nginx/sites-available/werminal.conf /etc/nginx/sites-enabled/werminal.conf
 
