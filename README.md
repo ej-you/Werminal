@@ -20,6 +20,26 @@ docker compose up --build
 
 ### Nginx & Server process
 
+#### Preparation
+
+> You should set up user/passwd for nginx `basic auth` before app installing.
+>
+> Follow the next guide
+
+##### Install tool for password hash generating
+
+```shell
+sudo apt install apache2-utils
+```
+
+##### Create password for user (user1 in the samople below)
+
+```shell
+htpasswd -с /etc/nginx/.htpasswd user1
+```
+
+#### App Installation
+
 Needed tools:
 
 1. Docker
