@@ -37,10 +37,12 @@ type pterm struct {
 func New(rows, cols uint16) (Terminal, error) {
 	shell := "bash"
 
+	// check that bash shell is available
 	err := exec.Command("command", "-v", "bash").Run()
 	if err != nil {
-		logrus.Warning("bash shell not found; use SHELL value as shell")
-		shell, err = parseShell()
+		logrus.Warning("bash shell not available; use SHELL value as shell")
+		// parse SHELL env-variable
+		shell, err = parseShellEnv()
 		if err != nil {
 			return nil, err
 		}
@@ -150,8 +152,8 @@ func (t *pterm) disableEcho() error {
 	return nil
 }
 
-// parseShell parses value of SHELL env-variable.
-func parseShell() (string, error) {
+// parseShellEnv parses value of SHELL env-variable.
+func parseShellEnv() (string, error) {
 	// parse terminal shell value
 	shell, ok := os.LookupEnv("SHELL")
 	if !ok {

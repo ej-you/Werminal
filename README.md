@@ -18,23 +18,24 @@ cd ./Werminal/deployment
 docker compose up --build
 ```
 
-### Nginx & Systemd
+### Nginx & Server process
 
 Needed tools:
 
 1. Docker
 2. Nginx
 
-Configuration is static (may be improved in the future). Used ports:
+Configuration is static. Used ports:
 
-1. 8851 - for server part (run as system service)
+1. 8851 - for server part (run as process)
 2. 8092 - listening port for Nginx
 
 To install Werminal use script `./scripts/install.sh`. Run it as root.
+To uninstall Werminal use script `./scripts/uninstall.sh`. Run it as root.
 
 ## Used tools
 
 1. `Golang` (server) with `pty` package
 2. `JS` (client) with `xterm.js` library
 3. `WebSocket` for client-server connection
-4. `Docker compose` for app deployment
+4. `Docker` for app deployment

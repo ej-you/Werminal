@@ -1,6 +1,17 @@
 #!/bin/bash
 
+serverPort=8851
+domain="fredcv.ru"
+nginxPort=8092
+userForServer=danil
+
 scriptPath=$(dirname "$(realpath "$0")")
+
+rc="\033[31m" # red
+yc="\033[33m" # yellow
+gc="\033[32m" # green
+dc="\033[0m" # default
+
 
 # exit if current user is not root
 function checkRoot() {
@@ -9,7 +20,7 @@ function checkRoot() {
 
     if [ "$user" != "root" ]; then
         echo "Please, run this script with root privileges"
-        echo "Aborted"
+        echo "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -19,9 +30,9 @@ function checkDocker() {
     echo "Check docker..."
 
     if [ ! "$(command -v docker)" ]; then
-        echo "Docker is not installed"
+        echo "${rc}ERROR: Docker is not installed${dc}"
         echo "Install docker manually and run this script again"
-        echo "Aborted"
+        echo "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -31,9 +42,9 @@ function checkNginx() {
     echo "Check nginx..."
 
     if [ ! "$(command -v nginx)" ]; then
-        echo "Nginx is not installed"
+        echo "${rc}ERROR: Nginx is not installed${dc}"
         echo "Install nginx manually and run this script again"
-        echo "Aborted"
+        echo "${rc}Aborted${dc}"
         exit 1
     fi
 }
@@ -50,7 +61,7 @@ function setupClientFiles() {
     docker image rm werminal_client:latest
 }
 
-# compile server part and create system service
+# compile server part and run server as process
 function setupServer() {
     echo "Install server..."
     mkdir -p /var/www/werminal/server
@@ -61,14 +72,9 @@ function setupServer() {
     docker run --rm --volume /var/www/werminal/server/bin:/server/bin:rw werminal_server:latest
     docker image rm werminal_server:latest
 
-    echo "SERVER_PORT=8851" > /var/www/werminal/server/env
-
-    echo "Create system service..."
-    cp ./server.service /etc/systemd/system/werminal.service
-
-    systemctl daemon-reload
-    systemctl start werminal.service
-    systemctl enable werminal.service
+    echo "Start server at :$serverPort..."
+    cd "/home/$userForServer" || cd /
+    SERVER_PORT="$serverPort" sudo -u "$userForServer" bash -c "/var/www/werminal/server/bin/app &> /var/www/werminal/server/app.log &"
 }
 
 # setup nginx
@@ -77,16 +83,16 @@ function setupNginx() {
     ln -s /etc/nginx/sites-available/werminal.conf /etc/nginx/sites-enabled/werminal.conf
 
     nginx -t
-    nginx -s reload
+    nginx -s reloadserverPort
 }
 
 function finish() {
-    echo "Installation is finished!"
-    echo "Your app run at http://domain.com:8092"
+    echo "${gc}Installation is finished!${dc}"
+    echo "Your app run at http://$domain:$nginxPort"
 
-    echo "Pay attention, please!"
+    echo "${yc}Pay attention, please!"
     echo "If app is not run, check line \"include /etc/nginx/sites-enabled/*;\" in http directive in main nginx config (/etc/nginx/nginx.conf)"
-    echo "If this line missing then insert it and restart nginx with \"nginx -s reload\""
+    echo "If this line missing then insert it and restart nginx with \"nginx -s reload\"${dc}"
 }
 
 checkRoot
