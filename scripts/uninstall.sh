@@ -59,7 +59,8 @@ function removeServer() {
     echo -e "To stop server process you should find it and kill."
     echo -e "To find server process use \"pgrep -af /var/www/werminal/server/bin/app\""
     echo -e "This command will print out the proccess PID and run binary"
-    echo -e "Use \"sudo kill -9 {PID}\" to kill server process${dc}"
+    echo -e "Use \"sudo kill -15 {PID}\" to gracefully shutdown server process${dc}"
+    echo -e "If the command above is executed for more than 10 seconds use \"sudo kill -9 {PID}\" to kill server process${dc}"
 }
 
 # remove nginx config for this app

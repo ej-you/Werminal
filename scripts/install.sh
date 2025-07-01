@@ -73,8 +73,13 @@ function setupServer() {
     docker image rm werminal_server:latest
 
     echo "Start server at :$serverPort..."
+    logFile="/var/www/werminal/server/app.log"
+    touch "$logFile" && chown "$userForServer":"$userForServer" "$logFile"
     cd "/home/$userForServer" || cd /
-    SERVER_PORT="$serverPort" sudo -u "$userForServer" bash -c "/var/www/werminal/server/bin/app &> /var/www/werminal/server/app.log &"
+    sudo -u "$userForServer" SERVER_PORT="$serverPort" bash -c "/var/www/werminal/server/bin/app &> $logFile &"
+
+    echo "Check process is run..."
+    pgrep -af /var/www/werminal/server/bin/app
 }
 
 # setup nginx
