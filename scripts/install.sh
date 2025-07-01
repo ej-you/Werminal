@@ -42,7 +42,7 @@ function checkNginx() {
 function setupClientFiles() {
     echo "Install client files..."
     mkdir -p /var/www/werminal/client
-    cp -r "$scriptPath"/../website /var/www/werminal/client
+    cp -r "$scriptPath"/../website/* /var/www/werminal/client
 
     cd "$scriptPath" || exit 1
     docker build -t werminal_client:latest -f DockerfileClient ..
