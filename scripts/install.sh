@@ -18,7 +18,7 @@ function checkRoot() {
 function checkDocker() {
     echo "Check docker..."
 
-    if [ ! "$(docker --version)" ]; then
+    if [ ! "$(command -v docker)" ]; then
         echo "Docker is not installed"
         echo "Install docker manually and run this script again"
         echo "Aborted"
@@ -30,7 +30,7 @@ function checkDocker() {
 function checkNginx() {
     echo "Check nginx..."
 
-    if [ ! "$(nginx -v)" ]; then
+    if [ ! "$(command -v nginx)" ]; then
         echo "Nginx is not installed"
         echo "Install nginx manually and run this script again"
         echo "Aborted"
