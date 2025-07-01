@@ -95,7 +95,7 @@ function setupNginx() {
 
 function finish() {
     echo -e "${gc}Installation is finished!${dc}"
-    echo "Your app run at http://$domain:$nginxPort"
+    echo "Your app run at https://$domain:$nginxPort"
 
     echo -e "${yc}Pay attention, please!"
     echo -e "If app is not run, check line \"include /etc/nginx/sites-enabled/*;\" in http directive in main nginx config (/etc/nginx/nginx.conf)"
