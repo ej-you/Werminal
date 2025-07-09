@@ -16,6 +16,8 @@ cd ./Werminal/deployment
 docker compose up --build
 ```
 
+App will be opened on `http://localhost:8803`
+
 ## Used tools
 
 1. `Golang` (server) with `pty` package
