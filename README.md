@@ -11,14 +11,14 @@ SERVER_SHUTDOWN_TIMEOUT=5s
 
 ## Deploy
 
-### Docker
+### Docker (terminal for docker container)
 
 ```shell
 cd ./Werminal/deployment
 docker compose up --build
 ```
 
-### Nginx & Server process
+### Nginx & Server process (terminal for host machine)
 
 #### Preparation
 
@@ -32,7 +32,7 @@ docker compose up --build
 sudo apt install apache2-utils
 ```
 
-##### Create password for user (user1 in the samople below)
+##### Create password for user (user1 in the sample below)
 
 ```shell
 htpasswd -с /etc/nginx/.htpasswd user1
