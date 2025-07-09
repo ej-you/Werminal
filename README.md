@@ -18,6 +18,8 @@ cd ./Werminal/deployment
 docker compose up --build
 ```
 
+App will be opened on `http://localhost:8803`
+
 ### Nginx & Server process (terminal for host machine)
 
 #### Preparation

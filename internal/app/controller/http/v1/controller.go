@@ -4,6 +4,7 @@ package v1
 
 import (
 	"context"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	gowebsocket "github.com/gofiber/websocket/v2"
@@ -15,16 +16,20 @@ import (
 
 // TerminalController is a HTTP-controller for task usecase.
 type TerminalController struct {
-	wsConfig gowebsocket.Config
+	wsConfig    gowebsocket.Config
+	readTimeout time.Duration
 }
 
 // NewTerminalController returns new TerminalController.
-func NewTerminalController(readBufferSize, writeBufferSize int) *TerminalController {
+func NewTerminalController(readBufferSize, writeBufferSize int,
+	readTimeout time.Duration) *TerminalController {
+
 	return &TerminalController{
 		wsConfig: gowebsocket.Config{
 			ReadBufferSize:  readBufferSize,
 			WriteBufferSize: writeBufferSize,
 		},
+		readTimeout: readTimeout,
 	}
 }
 
@@ -41,6 +46,11 @@ func (c *TerminalController) Terminal() fiber.Handler {
 		logrus.Infof("New connection to terminal with size %dx%d", dataIn.Rows, dataIn.Cols)
 		// context for stream and terminal
 		ctx, cancel := context.WithCancel(context.Background())
+
+		// setup ping-pong handler
+		if err := websocket.SetupPingPong(ctx, conn, c.readTimeout); err != nil {
+			logrus.Errorf("setup ping-pong: %v", err)
+		}
 
 		// create new WebSocket stream
 		wsStream := websocket.NewStream(conn)

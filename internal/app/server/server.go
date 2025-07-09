@@ -57,6 +57,7 @@ func (s *httpServer) Run() {
 	terminalController := http.NewTerminalController(
 		s.cfg.Server.WS.ReadBufferSize,
 		s.cfg.Server.WS.WriteBufferSize,
+		s.cfg.Server.WS.ReadTimeout,
 	)
 
 	// register endpoints

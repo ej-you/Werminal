@@ -20,8 +20,9 @@ type (
 	}
 
 	WS struct {
-		ReadBufferSize  int `env:"SERVER_WS_READ_BUF_SIZE" env-default:"1024"`
-		WriteBufferSize int `env:"SERVER_WS_WRITE_BUF_SIZE" env-default:"1024"`
+		ReadBufferSize  int           `env:"SERVER_WS_READ_BUF_SIZE" env-default:"1024"`
+		WriteBufferSize int           `env:"SERVER_WS_WRITE_BUF_SIZE" env-default:"1024"`
+		ReadTimeout     time.Duration `env:"SERVER_WS_READ_TIMEOUT" env-default:"60s"`
 	}
 )
 
